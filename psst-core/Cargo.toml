@@ -1,0 +1,38 @@
+[package]
+name = "psst-core"
+version = "0.1.0"
+authors = ["Jan Pochyla <jpochyla@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+# Common
+byteorder = "1.4.3"
+crossbeam-channel = "0.5.2"
+log =  "0.4.14"
+num-bigint = { version = "0.4.3", features = ["rand"] }
+num-traits =  "0.2.14" 
+parking_lot = "0.12.0"
+protocol = "3.2.0"
+
+# Cryptography
+rand = "0.8.5" 
+rangemap = "1.0.1"
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.79" 
+socks = "0.3.4"
+tempfile = "3.3.0"
+ureq = { version = "2.4.0", features = ["json"] }
+url = "2.2.2"
+
+aes = "0.8.1"
+ctr = "0.9.1"
+hmac = "0.12.1"
+sha-1 = "0.10.0"
+shannon = "0.2.0"
+
+# Audio
+audio_thread_priority = { version = "0.26.0", default-features = false, features = ["winapi"] }
+cpal = "0.13.5" 
+libsamplerate = "0.1.0" 
+rb = "0.4.0" 
+symphonia = { version = "0.5.0", default-features = false, features = ["ogg", "vorbis", "mp3"]}
