@@ -4,7 +4,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:rowdy/rowdy.dart';
 
-void main() {
+void main() async {
+  await Rowdy.initRPC();
   runApp(const MyApp());
 }
 

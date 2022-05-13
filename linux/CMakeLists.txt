@@ -19,7 +19,7 @@ target_link_libraries(${PLUGIN_NAME} PRIVATE flutter)
 target_link_libraries(${PLUGIN_NAME} PRIVATE PkgConfig::GTK)
 
 # List of absolute paths to libraries that should be bundled with the plugin
-set(rowdy_bundled_libraries
-  ""
+set(
+  rowdy_bundled_libraries
   PARENT_SCOPE
 )
