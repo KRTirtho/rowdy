@@ -44,7 +44,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-native/target
+rustee_rowdy/target
 jniLibs
 
 Cargo.lock

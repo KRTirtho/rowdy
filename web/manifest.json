@@ -1,6 +1,6 @@
 {
-    "name": "flutter_rust_bridge_template",
-    "short_name": "flutter_rust_bridge_template",
+    "name": "rowdy",
+    "short_name": "rowdy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

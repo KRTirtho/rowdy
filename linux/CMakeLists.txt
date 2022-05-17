@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(runner LANGUAGES CXX)
 
-set(BINARY_NAME "flutter_rust_bridge_template")
-set(APPLICATION_ID "com.example.flutter_rust_bridge_template")
+set(BINARY_NAME "rowdy")
+set(APPLICATION_ID "com.example.rowdy")
 
 cmake_policy(SET CMP0063 NEW)
 

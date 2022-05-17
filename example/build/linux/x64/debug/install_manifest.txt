@@ -1,0 +1,11 @@
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/rowdy_example
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/icudtl.dat
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/lib/libflutter_linux_gtk.so
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/lib/librowdy_plugin.so
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/AssetManifest.json
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/FontManifest.json
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/NOTICES.Z
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/version.json
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/kernel_blob.bin
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf
+/home/krtirtho/dev/rowdy/example/build/linux/x64/debug/bundle/data/flutter_assets/fonts/MaterialIcons-Regular.otf
