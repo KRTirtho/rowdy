@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:rowdy/rowdy.dart';
 
 void main() {
+  Rowdy.initialize();
   runApp(const MyApp());
 }
 
@@ -17,10 +18,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  late Rowdy rowdy;
 
   @override
   void initState() {
     super.initState();
+    rowdy = Rowdy();
     initPlatformState();
   }
 
@@ -53,8 +56,19 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: [
+            Center(
+              child: Text('Running on: $_platformVersion\n'),
+            ),
+            FutureBuilder<String>(
+                future: rowdy.hello(),
+                builder: (context, snapshot) {
+                  return Center(
+                    child: Text('Rowdy MSG ${snapshot.data}'),
+                  );
+                }),
+          ],
         ),
       ),
     );

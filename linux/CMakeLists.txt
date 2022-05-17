@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 set(PROJECT_NAME "rowdy")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
@@ -23,3 +23,6 @@ set(rowdy_bundled_libraries
   ""
   PARENT_SCOPE
 )
+
+# flutter_rust_bridge
+include(./rust.cmake)
