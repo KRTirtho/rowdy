@@ -16,9 +16,9 @@ public final class GeneratedPluginRegistrant {
   private static final String TAG = "GeneratedPluginRegistrant";
   public static void registerWith(@NonNull FlutterEngine flutterEngine) {
     try {
-      flutterEngine.getPlugins().add(new com.example.beep.BeepPlugin());
+      flutterEngine.getPlugins().add(new com.github.KRTirtho.rowdy.RowdyPlugin());
     } catch(Exception e) {
-      Log.e(TAG, "Error registering plugin beep, com.example.beep.BeepPlugin", e);
+      Log.e(TAG, "Error registering plugin rowdy, com.github.KRTirtho.rowdy.RowdyPlugin", e);
     }
   }
 }

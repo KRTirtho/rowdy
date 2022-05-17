@@ -6,16 +6,16 @@
 
 #import "GeneratedPluginRegistrant.h"
 
-#if __has_include(<beep/BeepPlugin.h>)
-#import <beep/BeepPlugin.h>
+#if __has_include(<rowdy/RowdyPlugin.h>)
+#import <rowdy/RowdyPlugin.h>
 #else
-@import beep;
+@import rowdy;
 #endif
 
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
-  [BeepPlugin registerWithRegistrar:[registry registrarForPlugin:@"BeepPlugin"]];
+  [RowdyPlugin registerWithRegistrar:[registry registrarForPlugin:@"RowdyPlugin"]];
 }
 
 @end
