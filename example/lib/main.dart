@@ -65,7 +65,7 @@ class _MyAppState extends State<MyApp> {
             IconButton(
               icon: const Icon(Icons.play_circle_outline_rounded),
               onPressed: () async {
-                await playback.play("audio/malibu.mp3");
+                print("DURATION: ${await playback.play("audio/malibu.mp3")}");
               },
             ),
             IconButton(
