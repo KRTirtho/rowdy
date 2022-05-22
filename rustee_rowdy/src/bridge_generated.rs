@@ -29,6 +29,18 @@ pub extern "C" fn wire_hello(port_: i64) {
     )
 }
 
+#[no_mangle]
+pub extern "C" fn wire_init_audio_server(port_: i64) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap(
+        WrapInfo {
+            debug_name: "init_audio_server",
+            port: Some(port_),
+            mode: FfiCallMode::Normal,
+        },
+        move || move |task_callback| init_audio_server(),
+    )
+}
+
 // Section: wire structs
 
 // Section: wrapper structs

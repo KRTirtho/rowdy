@@ -13,6 +13,8 @@ import 'dart:ffi' as ffi;
 
 abstract class RusteeRowdy {
   Future<String> hello({dynamic hint});
+
+  Future<void> initAudioServer({dynamic hint});
 }
 
 class RusteeRowdyImpl extends FlutterRustBridgeBase<RusteeRowdyWire>
@@ -27,6 +29,18 @@ class RusteeRowdyImpl extends FlutterRustBridgeBase<RusteeRowdyWire>
         parseSuccessData: _wire2api_String,
         constMeta: const FlutterRustBridgeTaskConstMeta(
           debugName: "hello",
+          argNames: [],
+        ),
+        argValues: [],
+        hint: hint,
+      ));
+
+  Future<void> initAudioServer({dynamic hint}) =>
+      executeNormal(FlutterRustBridgeTask(
+        callFfi: (port_) => inner.wire_init_audio_server(port_),
+        parseSuccessData: _wire2api_unit,
+        constMeta: const FlutterRustBridgeTaskConstMeta(
+          debugName: "init_audio_server",
           argNames: [],
         ),
         argValues: [],
@@ -50,6 +64,10 @@ int _wire2api_u8(dynamic raw) {
 
 Uint8List _wire2api_uint_8_list(dynamic raw) {
   return raw as Uint8List;
+}
+
+void _wire2api_unit(dynamic raw) {
+  return;
 }
 
 // ignore_for_file: camel_case_types, non_constant_identifier_names, avoid_positional_boolean_parameters, annotate_overrides, constant_identifier_names
@@ -85,6 +103,20 @@ class RusteeRowdyWire implements FlutterRustBridgeWireBase {
   late final _wire_helloPtr =
       _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>('wire_hello');
   late final _wire_hello = _wire_helloPtr.asFunction<void Function(int)>();
+
+  void wire_init_audio_server(
+    int port_,
+  ) {
+    return _wire_init_audio_server(
+      port_,
+    );
+  }
+
+  late final _wire_init_audio_serverPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Int64)>>(
+          'wire_init_audio_server');
+  late final _wire_init_audio_server =
+      _wire_init_audio_serverPtr.asFunction<void Function(int)>();
 
   void free_WireSyncReturnStruct(
     WireSyncReturnStruct val,

@@ -18,13 +18,17 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  late Rowdy rowdy;
+  late PlaybackService playback;
+  double volume = 0;
 
   @override
   void initState() {
     super.initState();
-    rowdy = Rowdy();
     initPlatformState();
+    playback = PlaybackService();
+    playback.getVolume().then((value) {
+      volume = value;
+    });
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -56,18 +60,51 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Column(
+        body: Row(
           children: [
-            Center(
-              child: Text('Running on: $_platformVersion\n'),
+            IconButton(
+              icon: const Icon(Icons.play_circle_outline_rounded),
+              onPressed: () async {
+                await playback.play("audio/malibu.mp3");
+              },
             ),
-            FutureBuilder<String>(
-                future: rowdy.hello(),
-                builder: (context, snapshot) {
-                  return Center(
-                    child: Text('Rowdy MSG ${snapshot.data}'),
-                  );
-                }),
+            IconButton(
+              icon: const Icon(Icons.pause),
+              onPressed: () async {
+                await playback.pause();
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.play_arrow_rounded),
+              onPressed: () async {
+                await playback.pause();
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.stop_rounded),
+              onPressed: () async {
+                await playback.stop();
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.legend_toggle_rounded),
+              onPressed: () async {
+                await playback.togglePlayback();
+              },
+            ),
+            Slider(
+              value: volume,
+              max: 100,
+              min: 0,
+              onChanged: (value) {
+                // setting volume in percentage
+                setState(() {
+                  playback.setVolume(value).then((_) {
+                    volume = value;
+                  });
+                });
+              },
+            )
           ],
         ),
       ),

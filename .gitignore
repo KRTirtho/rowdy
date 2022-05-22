@@ -28,4 +28,4 @@
 .packages
 build/
 
-rustee_rowdy/target
+**/target

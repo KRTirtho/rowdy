@@ -10,13 +10,14 @@ flutter_rust_bridge = "1"
 anyhow = "1.0.57"
 thiserror = "1.0.31"
 rowdy_player = { path = "../rowdy_player" }
-tokio = {version= "1.18.2", features = ["macros", "rt-multi-thread"]}
+tokio = { version = "1.18.2", features = ["rt-multi-thread"] }
 tonic = "0.7.2"
 tonic-reflection = "0.4.0"
 prost = "0.10.3"
+futures = "0.3.21"
 
 [build-dependencies]
 tonic-build = "0.7.2"
 
 [lib]
-crate-type = ["staticlib", "cdylib"]
+crate-type = ["cdylib"]

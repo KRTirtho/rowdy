@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_rust_bridge: ^1.30.0
+  grpc: ^3.0.2
+  protobuf: ^2.0.1
 
 dev_dependencies:
   flutter_test:

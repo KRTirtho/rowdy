@@ -18,6 +18,11 @@ gen:
     # Uncomment this line to invoke build_runner as well
     # flutter pub run build_runner build
 
+protogen:
+        cd rustee_rowdy && \
+        protoc proto/playback.proto \
+        --dart_out=grpc:../lib/
+
 lint:
     cd rustee_rowdy && cargo fmt
     dart format .
