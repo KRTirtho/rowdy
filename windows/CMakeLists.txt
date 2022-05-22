@@ -22,6 +22,3 @@ set(rowdy_bundled_libraries
   ""
   PARENT_SCOPE
 )
-
-# flutter_rust_bridge
-include(./rust.cmake)

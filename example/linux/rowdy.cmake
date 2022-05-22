@@ -14,7 +14,7 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Corrosion)
 
-corrosion_import_crate(MANIFEST_PATH ../rustee_rowdy/Cargo.toml)
+corrosion_import_crate(MANIFEST_PATH flutter/ephemeral/.plugin_symlinks/rowdy/rustee_rowdy/Cargo.toml)
 
 # Flutter-specific
 
