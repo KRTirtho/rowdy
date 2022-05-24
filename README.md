@@ -53,3 +53,12 @@ include(flutter/generated_plugins.cmake)
 # so that building and running from within Visual Studio will work.
 set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
 ```
+
+# Impletmented Features set (Things that works)
+- [x] Local Audio file
+- [x] Formats: mp3, flac, wav & ogg. (acc is supported but the decoder is failing for some reason)
+- [x] Play, Pause/Resume, Toggle Playback, Stop
+- [x] Volume (in percentage)
+- [x] Speed
+- [x] Seek
+- [x] Position (Steaming too)
