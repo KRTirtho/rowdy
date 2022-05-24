@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:fixnum/fixnum.dart' show Int64;
 import 'package:grpc/grpc.dart';
-import 'package:rowdy/proto/playback.pbgrpc.dart';
+import 'package:rowdy/proto/playback.pbgrpc.dart' hide Duration;
+import 'package:rowdy/proto/playback.pbgrpc.dart' as playback;
 
 class PlaybackService {
   late final PlaybackClient channel;
@@ -22,11 +24,11 @@ class PlaybackService {
     }
   }
 
-  Future<Duration> play(String path) async {
+  Future<playback.Duration> play(String path) async {
     final response = await channel.play(
       Path(cwd: Directory.current.path, path: path, isAbsolute: true),
     );
-    return Duration(
+    return playback.Duration(
       milliseconds: response.milliseconds,
     );
   }
@@ -61,5 +63,15 @@ class PlaybackService {
 
   Future<void> setSpeed(double speed) async {
     await channel.setSpeed(Speed(speed: speed));
+  }
+
+  Future<void> seek(int positionSeconds) async {
+    await channel.seek(playback.Duration(milliseconds: Int64(positionSeconds)));
+  }
+
+  Stream<Duration> get positionStream {
+    return channel.getPositionStream(Empty()).map((duration) {
+      return Duration(milliseconds: duration.milliseconds.toInt());
+    });
   }
 }

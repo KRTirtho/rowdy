@@ -33,27 +33,28 @@ package owners whose package was used in making of `termusic`'s rust_backend's [
 
 #![cfg_attr(test, deny(missing_docs))]
 
-mod conversions;
-mod sink;
-mod stream;
-
 pub mod buffer;
+mod conversions;
 pub mod decoder;
 pub mod dynamic_mixer;
 pub mod queue;
+mod sink;
 pub mod source;
+mod stream;
 
 pub use conversions::Sample;
 pub use cpal::{
     self, traits::DeviceTrait, Device, Devices, DevicesError, InputDevices, OutputDevices,
     SupportedStreamConfig,
 };
+use flume::Receiver;
 pub use decoder::Decoder;
 pub use sink::Sink;
 pub use source::Source;
 pub use stream::{OutputStream, OutputStreamHandle, PlayError, StreamError};
 
 use std::path::Path;
+use std::sync::Arc;
 use std::time::Duration;
 use std::{fs::File, io::BufReader};
 
@@ -197,6 +198,10 @@ impl Player {
         self.speed = speed;
         self.sink.set_speed(speed);
     }
+
+    pub fn get_elapsed_receiver(&self) -> Arc<Receiver<Duration>> {
+        self.sink.elapsed_rx.clone()
+    }
 }
 
 impl GeneralP for Player {
@@ -294,6 +299,7 @@ impl GeneralP for Player {
 }
 
 unsafe impl Send for Player {}
+unsafe impl Sync for Player {}
 
 pub trait GeneralP {
     fn add_and_play(&mut self, new: &str);

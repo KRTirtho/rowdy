@@ -15,9 +15,14 @@ tonic = "0.7.2"
 tonic-reflection = "0.4.0"
 prost = "0.10.3"
 futures = "0.3.21"
+tokio-stream = "0.1.8"
 
 [build-dependencies]
 tonic-build = "0.7.2"
 
 [lib]
 crate-type = ["cdylib"]
+
+[[bin]]
+name = "rowdy_server"
+path = "src/main.rs"

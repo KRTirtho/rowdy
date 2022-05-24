@@ -5,6 +5,7 @@ use std::time::Duration;
 //     collections::VecDeque,
 //     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 // };
+use flume::{self};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use super::{queue, source::Done, Sample, Source};
@@ -25,6 +26,10 @@ pub struct Sink {
     detached: bool,
 
     elapsed: Arc<RwLock<Duration>>,
+
+    elapsed_sender: Arc<flume::Sender<Duration>>,
+
+    pub elapsed_rx: Arc<flume::Receiver<Duration>>,
 }
 
 struct Controls {
@@ -51,6 +56,8 @@ impl Sink {
     pub fn new_idle() -> (Self, queue::SourcesQueueOutput<f32>) {
         let (queue_tx, queue_rx) = queue::queue(true);
 
+        let (atx, arx) = flume::unbounded::<Duration>();
+
         let sink = Self {
             queue_tx,
             // sleep_until_end: Mutex::new(VecDeque::new()),
@@ -65,6 +72,8 @@ impl Sink {
             sound_count: Arc::new(AtomicUsize::new(0)),
             detached: false,
             elapsed: Arc::new(RwLock::new(Duration::from_secs(0))),
+            elapsed_sender: Arc::new(atx),
+            elapsed_rx: Arc::new(arx),
         };
         (sink, queue_rx)
     }
@@ -80,6 +89,7 @@ impl Sink {
         let controls = self.controls.clone();
 
         let elapsed = self.elapsed.clone();
+        let elapsed_invoker = self.elapsed_sender.clone();
         let source = source
             .speed(1.0)
             .pausable(false)
@@ -93,6 +103,8 @@ impl Sink {
                         src.seek(seek_time).unwrap();
                     }
                     *elapsed.write().unwrap() = src.elapsed();
+                    elapsed_invoker.send(src.elapsed()).unwrap();
+                    println!("Elapsed time {}", src.elapsed().as_secs());
                     src.inner_mut().set_factor(*controls.volume.lock().unwrap());
                     src.inner_mut()
                         .inner_mut()

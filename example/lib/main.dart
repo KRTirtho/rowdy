@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> {
             IconButton(
               icon: const Icon(Icons.play_arrow_rounded),
               onPressed: () async {
-                await playback.pause();
+                await playback.resume();
               },
             ),
             IconButton(
@@ -90,6 +90,13 @@ class _MyAppState extends State<MyApp> {
               icon: const Icon(Icons.legend_toggle_rounded),
               onPressed: () async {
                 await playback.togglePlayback();
+              },
+            ),
+            StreamBuilder<Duration>(
+              stream: playback.positionStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) throw snapshot.error as Exception;
+                return Text("Elapsed time: ${snapshot.data}");
               },
             ),
             Slider(

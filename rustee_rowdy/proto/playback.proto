@@ -20,6 +20,9 @@ service Playback {
   rpc SetVolume(Volume) returns (Empty) {}
   rpc GetSpeed(Empty) returns (Speed) {}
   rpc SetSpeed(Speed) returns (Empty) {}
+  rpc Seek(Duration) returns (Empty) {}
+  rpc GetPosition(Empty) returns (Duration) {}
+  rpc GetPositionStream(Empty) returns (stream Duration) {}
 }
 
 message Empty {}
