@@ -46,7 +46,9 @@ impl Playback for PlaybackService {
         player.play(&path);
 
         Ok(Response::new(Duration {
-            milliseconds: (player.duration().unwrap_or_else(|| 0_f64) * 1000_f64).round() as i64,
+            milliseconds: ((player.duration().unwrap_or_else(|| 0_f64) * 1000_f64)
+                .round()
+                .abs()) as i64,
         }))
     }
     async fn pause(&self, _incoming: Request<Empty>) -> Result<Response<Empty>, Status> {
@@ -125,6 +127,7 @@ impl Playback for PlaybackService {
         let (tx, rx) = mpsc::unbounded_channel::<Result<Duration, Status>>();
         let player = self.player.read().await;
         let receiver = player.get_elapsed_receiver().clone();
+        println!("Before Starting Elapse Task");
         tokio::spawn(async move {
             println!("Starting Elapse Task");
             let mut prev_pos = 0_f64;

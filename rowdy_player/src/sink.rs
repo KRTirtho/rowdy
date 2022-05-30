@@ -90,6 +90,7 @@ impl Sink {
 
         let elapsed = self.elapsed.clone();
         let elapsed_invoker = self.elapsed_sender.clone();
+        let mut prev_pos = 0_u64;
         let source = source
             .speed(1.0)
             .pausable(false)
@@ -102,8 +103,12 @@ impl Sink {
                     if let Some(seek_time) = controls.seek.lock().unwrap().take() {
                         src.seek(seek_time).unwrap();
                     }
-                    *elapsed.write().unwrap() = src.elapsed();
-                    elapsed_invoker.send(src.elapsed()).unwrap();
+                    let src_elapsed = src.elapsed();
+                    *elapsed.write().unwrap() = src_elapsed;
+                    if src_elapsed.as_secs() != prev_pos {
+                        elapsed_invoker.send(src_elapsed).unwrap();
+                        prev_pos = src_elapsed.as_secs();
+                    }
                     println!("Elapsed time {}", src.elapsed().as_secs());
                     src.inner_mut().set_factor(*controls.volume.lock().unwrap());
                     src.inner_mut()

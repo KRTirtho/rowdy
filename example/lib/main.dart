@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:rowdy/rowdy.dart';
 
 void main() {
-  Rowdy.initialize();
+  // Rowdy.initialize();
   runApp(const MyApp());
 }
 
@@ -20,6 +20,9 @@ class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
   late PlaybackService playback;
   double volume = 0;
+  late Duration duration = Duration.zero;
+  late Duration position = Duration.zero;
+  bool changing = false;
 
   @override
   void initState() {
@@ -29,6 +32,15 @@ class _MyAppState extends State<MyApp> {
     playback.getVolume().then((value) {
       volume = value;
     });
+    playback.getPolledPositionStream().listen(
+      (value) {
+        if (value != Duration.zero && !changing) {
+          setState(() {
+            position = value;
+          });
+        }
+      },
+    );
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -54,6 +66,12 @@ class _MyAppState extends State<MyApp> {
   }
 
   @override
+  void dispose() {
+    playback.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
@@ -65,7 +83,11 @@ class _MyAppState extends State<MyApp> {
             IconButton(
               icon: const Icon(Icons.play_circle_outline_rounded),
               onPressed: () async {
-                print("DURATION: ${await playback.play("audio/malibu.mp3")}");
+                final fetchedDuration =
+                    await playback.play("/home/krtirtho/Music/malibu.flac");
+                setState(() {
+                  duration = fetchedDuration;
+                });
               },
             ),
             IconButton(
@@ -92,11 +114,22 @@ class _MyAppState extends State<MyApp> {
                 await playback.togglePlayback();
               },
             ),
-            StreamBuilder<Duration>(
-              stream: playback.positionStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasError) throw snapshot.error as Exception;
-                return Text("Elapsed time: ${snapshot.data}");
+            Slider(
+              value: position.inSeconds.toDouble(),
+              max:
+                  duration.inSeconds == 0 ? 100 : duration.inSeconds.toDouble(),
+              min: 0,
+              onChanged: (value) => setState(() {
+                setState(() {
+                  changing = true;
+                });
+                position = Duration(seconds: value.toInt());
+              }),
+              onChangeEnd: (position) {
+                playback.seek(Duration(seconds: position.round()));
+                setState(() {
+                  changing = false;
+                });
               },
             ),
             Slider(
@@ -109,6 +142,7 @@ class _MyAppState extends State<MyApp> {
                 });
               },
               onChangeEnd: (value) {
+                print("OnChange End");
                 // setting volume in percentage
                 setState(() {
                   playback.setVolume(value).then((_) {
