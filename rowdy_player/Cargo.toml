@@ -13,7 +13,6 @@ url = "2.2"
 thiserror = "1.0"
 symphonia = { version = "0.5.0", features = ["aac", "mp3", "isomp4"] }
 cpal = "0.13"
-crossbeam-channel = "0.5"
 flume = "0.10.12"
 
 [lib]

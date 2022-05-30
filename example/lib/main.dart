@@ -104,6 +104,11 @@ class _MyAppState extends State<MyApp> {
               max: 100,
               min: 0,
               onChanged: (value) {
+                setState(() {
+                  volume = value;
+                });
+              },
+              onChangeEnd: (value) {
                 // setting volume in percentage
                 setState(() {
                   playback.setVolume(value).then((_) {
