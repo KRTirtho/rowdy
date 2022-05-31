@@ -62,10 +62,10 @@ class PlaybackClient extends $grpc.Client {
       '/playback.Playback/GetPosition',
       ($0.Empty value) => value.writeToBuffer(),
       ($core.List<$core.int> value) => $0.Duration.fromBuffer(value));
-  static final _$getPositionStream = $grpc.ClientMethod<$0.Empty, $0.Duration>(
-      '/playback.Playback/GetPositionStream',
+  static final _$subscribeEvents = $grpc.ClientMethod<$0.Empty, $0.ServerEvent>(
+      '/playback.Playback/SubscribeEvents',
       ($0.Empty value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Duration.fromBuffer(value));
+      ($core.List<$core.int> value) => $0.ServerEvent.fromBuffer(value));
 
   PlaybackClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -132,10 +132,10 @@ class PlaybackClient extends $grpc.Client {
     return $createUnaryCall(_$getPosition, request, options: options);
   }
 
-  $grpc.ResponseStream<$0.Duration> getPositionStream($0.Empty request,
+  $grpc.ResponseStream<$0.ServerEvent> subscribeEvents($0.Empty request,
       {$grpc.CallOptions? options}) {
     return $createStreamingCall(
-        _$getPositionStream, $async.Stream.fromIterable([request]),
+        _$subscribeEvents, $async.Stream.fromIterable([request]),
         options: options);
   }
 }
@@ -228,13 +228,13 @@ abstract class PlaybackServiceBase extends $grpc.Service {
         false,
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
         ($0.Duration value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.Empty, $0.Duration>(
-        'GetPositionStream',
-        getPositionStream_Pre,
+    $addMethod($grpc.ServiceMethod<$0.Empty, $0.ServerEvent>(
+        'SubscribeEvents',
+        subscribeEvents_Pre,
         false,
         true,
         ($core.List<$core.int> value) => $0.Empty.fromBuffer(value),
-        ($0.Duration value) => value.writeToBuffer()));
+        ($0.ServerEvent value) => value.writeToBuffer()));
   }
 
   $async.Future<$0.Msg> getHello_Pre(
@@ -297,9 +297,9 @@ abstract class PlaybackServiceBase extends $grpc.Service {
     return getPosition(call, await request);
   }
 
-  $async.Stream<$0.Duration> getPositionStream_Pre(
+  $async.Stream<$0.ServerEvent> subscribeEvents_Pre(
       $grpc.ServiceCall call, $async.Future<$0.Empty> request) async* {
-    yield* getPositionStream(call, await request);
+    yield* subscribeEvents(call, await request);
   }
 
   $async.Future<$0.Msg> getHello($grpc.ServiceCall call, $0.Empty request);
@@ -316,6 +316,6 @@ abstract class PlaybackServiceBase extends $grpc.Service {
   $async.Future<$0.Empty> seek($grpc.ServiceCall call, $0.Duration request);
   $async.Future<$0.Duration> getPosition(
       $grpc.ServiceCall call, $0.Empty request);
-  $async.Stream<$0.Duration> getPositionStream(
+  $async.Stream<$0.ServerEvent> subscribeEvents(
       $grpc.ServiceCall call, $0.Empty request);
 }

@@ -47,8 +47,8 @@ pub use cpal::{
     self, traits::DeviceTrait, Device, Devices, DevicesError, InputDevices, OutputDevices,
     SupportedStreamConfig,
 };
-use flume::Receiver;
 pub use decoder::Decoder;
+use flume::Receiver;
 pub use sink::Sink;
 pub use source::Source;
 pub use stream::{OutputStream, OutputStreamHandle, PlayError, StreamError};
@@ -59,6 +59,20 @@ use std::time::Duration;
 use std::{fs::File, io::BufReader};
 
 use anyhow::Result;
+
+pub enum PlaybackStatusType {
+    PAUSED,
+    CHANGED,
+    RESUMED,
+    STOPPED,
+}
+
+pub enum PlayerControlEvent {
+    Duration(Duration),
+    Speed(f64),
+    Volume(f64),
+    Playback(PlaybackStatusType),
+}
 
 static VOLUME_STEP: u16 = 5;
 
@@ -199,8 +213,8 @@ impl Player {
         self.sink.set_speed(speed);
     }
 
-    pub fn get_elapsed_receiver(&self) -> Arc<Receiver<Duration>> {
-        self.sink.elapsed_rx.clone()
+    pub fn get_control_event_receiver(&self) -> Arc<Receiver<PlayerControlEvent>> {
+        self.sink.control_event_rx.clone()
     }
 }
 

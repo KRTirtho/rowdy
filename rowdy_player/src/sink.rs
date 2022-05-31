@@ -8,6 +8,8 @@ use std::time::Duration;
 use flume::{self};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
+use crate::{PlaybackStatusType, PlayerControlEvent};
+
 use super::{queue, source::Done, Sample, Source};
 use super::{OutputStreamHandle, PlayError};
 
@@ -27,9 +29,8 @@ pub struct Sink {
 
     elapsed: Arc<RwLock<Duration>>,
 
-    elapsed_sender: Arc<flume::Sender<Duration>>,
-
-    pub elapsed_rx: Arc<flume::Receiver<Duration>>,
+    control_event_tx: Arc<flume::Sender<PlayerControlEvent>>,
+    pub control_event_rx: Arc<flume::Receiver<PlayerControlEvent>>,
 }
 
 struct Controls {
@@ -55,8 +56,7 @@ impl Sink {
     #[inline]
     pub fn new_idle() -> (Self, queue::SourcesQueueOutput<f32>) {
         let (queue_tx, queue_rx) = queue::queue(true);
-
-        let (atx, arx) = flume::unbounded::<Duration>();
+        let (control_event_tx, control_event_rx) = flume::unbounded::<PlayerControlEvent>();
 
         let sink = Self {
             queue_tx,
@@ -72,9 +72,18 @@ impl Sink {
             sound_count: Arc::new(AtomicUsize::new(0)),
             detached: false,
             elapsed: Arc::new(RwLock::new(Duration::from_secs(0))),
-            elapsed_sender: Arc::new(atx),
-            elapsed_rx: Arc::new(arx),
+            control_event_rx: Arc::new(control_event_rx),
+            control_event_tx: Arc::new(control_event_tx),
         };
+
+        let post_ctrl_event_tx = sink.control_event_tx.clone();
+
+        // default values for [Control] sent as an event
+        post_ctrl_event_tx.send(PlayerControlEvent::Duration(Duration::from_secs(0)));
+        // TODO Use actual [Path] instead of a fake one
+        post_ctrl_event_tx.send(PlayerControlEvent::Playback(PlaybackStatusType::CHANGED));
+        post_ctrl_event_tx.send(PlayerControlEvent::Speed(1.0));
+        post_ctrl_event_tx.send(PlayerControlEvent::Volume(1.0));
         (sink, queue_rx)
     }
 
@@ -89,8 +98,6 @@ impl Sink {
         let controls = self.controls.clone();
 
         let elapsed = self.elapsed.clone();
-        let elapsed_invoker = self.elapsed_sender.clone();
-        let mut prev_pos = 0_u64;
         let source = source
             .speed(1.0)
             .pausable(false)
@@ -99,17 +106,14 @@ impl Sink {
             .periodic_access(Duration::from_millis(50), move |src| {
                 if controls.stopped.load(Ordering::SeqCst) {
                     src.stop();
+                    // control_event_tx
+                    //     .send(PlayerControlEvent::Playback(PlaybackStatusType::STOPPED));
                 } else {
                     if let Some(seek_time) = controls.seek.lock().unwrap().take() {
                         src.seek(seek_time).unwrap();
                     }
                     let src_elapsed = src.elapsed();
                     *elapsed.write().unwrap() = src_elapsed;
-                    if src_elapsed.as_secs() != prev_pos {
-                        elapsed_invoker.send(src_elapsed).unwrap();
-                        prev_pos = src_elapsed.as_secs();
-                    }
-                    println!("Elapsed time {}", src.elapsed().as_secs());
                     src.inner_mut().set_factor(*controls.volume.lock().unwrap());
                     src.inner_mut()
                         .inner_mut()
@@ -121,6 +125,12 @@ impl Sink {
                 }
             })
             .convert_samples();
+        // firing duration event when the track is finally loaded
+        // successfully
+        if let Some(duration) = source.total_duration() {
+            self.control_event_tx
+                .send(PlayerControlEvent::Duration(duration));
+        }
         self.sound_count.fetch_add(1, Ordering::Relaxed);
         let source = Done::new(source, self.sound_count.clone());
         // self.sleep_until_end
@@ -146,6 +156,8 @@ impl Sink {
     #[inline]
     pub fn set_volume(&self, value: f32) {
         *self.controls.volume.lock().unwrap() = value;
+        self.control_event_tx
+            .send(PlayerControlEvent::Volume(value.into()));
     }
 
     /// Resumes playback of a paused sink.
@@ -153,7 +165,12 @@ impl Sink {
     /// No effect if not paused.
     #[inline]
     pub fn play(&self) {
+        let prev_value = self.is_paused();
         self.controls.pause.store(false, Ordering::SeqCst);
+        if prev_value && !self.is_paused() {
+            self.control_event_tx
+                .send(PlayerControlEvent::Playback(PlaybackStatusType::RESUMED));
+        }
     }
 
     /// Pauses playback of this sink.
@@ -162,7 +179,14 @@ impl Sink {
     ///
     /// A paused sink can be resumed with `play()`.
     pub fn pause(&self) {
+        let prev_value = self.is_paused();
         self.controls.pause.store(true, Ordering::SeqCst);
+        // only emit event when pause watch actually called & not was not
+        // just re-called
+        if !prev_value && self.is_paused() {
+            self.control_event_tx
+                .send(PlayerControlEvent::Playback(PlaybackStatusType::PAUSED));
+        }
     }
 
     /// Toggles playback of the sink
@@ -236,6 +260,8 @@ impl Sink {
     #[inline]
     pub fn set_speed(&self, value: f32) {
         *self.controls.speed.lock().unwrap() = value;
+        self.control_event_tx
+            .send(PlayerControlEvent::Volume(value.into()));
     }
 }
 

@@ -3,8 +3,11 @@ use std::pin::Pin;
 use std::sync::Arc;
 
 use playback::playback_server::Playback;
-use playback::{Duration, Empty, Msg, Speed, Volume};
-use rowdy_player::{GeneralP, Player};
+use playback::{
+    server_event::Eventtype, Duration, Empty, Msg, PlaybackEventPlayerState, ServerEvent,
+    ServerEventName, ServerPlaybackEvent, Speed, Volume,
+};
+use rowdy_player::{GeneralP, PlaybackStatusType, Player, PlayerControlEvent};
 use tokio::sync::{mpsc, RwLock};
 use tokio_stream::{wrappers::UnboundedReceiverStream, Stream};
 use tonic::{Request, Response, Status};
@@ -14,8 +17,6 @@ pub mod playback {
     pub(crate) const FILE_DESCRIPTOR_SET: &[u8] =
         tonic::include_file_descriptor_set!("playback_descriptor");
 }
-
-type DurationResponseStream = Pin<Box<dyn Stream<Item = Result<Duration, Status>> + Send>>;
 
 pub struct PlaybackService {
     player: Arc<RwLock<Player>>,
@@ -118,34 +119,53 @@ impl Playback for PlaybackService {
         }))
     }
 
-    type GetPositionStreamStream = DurationResponseStream;
+    type SubscribeEventsStream = Pin<Box<dyn Stream<Item = Result<ServerEvent, Status>> + Send>>;
 
-    async fn get_position_stream(
+    async fn subscribe_events(
         &self,
         _incoming: Request<Empty>,
-    ) -> Result<Response<Self::GetPositionStreamStream>, Status> {
-        let (tx, rx) = mpsc::unbounded_channel::<Result<Duration, Status>>();
+    ) -> Result<Response<Self::SubscribeEventsStream>, Status> {
+        let (tx, rx) = mpsc::unbounded_channel::<Result<ServerEvent, Status>>();
         let player = self.player.read().await;
-        let receiver = player.get_elapsed_receiver().clone();
-        println!("Before Starting Elapse Task");
+        let receiver = player.get_control_event_receiver().clone();
         tokio::spawn(async move {
-            println!("Starting Elapse Task");
-            let mut prev_pos = 0_f64;
-            while let Ok(elapsed) = receiver.recv_async().await {
-                let elapsed_secs = elapsed.as_secs_f64();
-                println!("Sent time {}", elapsed_secs);
-                if prev_pos != elapsed_secs {
-                    if let Err(what) = tx.send(Ok(Duration {
-                        milliseconds: elapsed.as_millis() as i64,
-                    })) {
-                        println!("Failed {}", what.to_string());
+            while let Ok(event) = receiver.recv_async().await {
+                let mut payload = ServerEvent::default();
+                match event {
+                    PlayerControlEvent::Duration(duration) => {
+                        payload.set_name(ServerEventName::Duration);
+                        payload.eventtype = Some(Eventtype::DurationData(Duration {
+                            milliseconds: duration.as_millis() as i64,
+                        }))
                     }
-                    prev_pos = elapsed_secs;
+                    PlayerControlEvent::Playback(status_type) => {
+                        let mut playback_data = ServerPlaybackEvent::default();
+                        let event_type = match status_type {
+                            PlaybackStatusType::CHANGED => PlaybackEventPlayerState::Changed,
+                            PlaybackStatusType::PAUSED => PlaybackEventPlayerState::Paused,
+                            PlaybackStatusType::RESUMED => PlaybackEventPlayerState::Resumed,
+                            PlaybackStatusType::STOPPED => PlaybackEventPlayerState::Stopped,
+                        };
+                        playback_data.set_playback_event_type(event_type);
+                        payload.set_name(ServerEventName::Playback);
+                        payload.eventtype = Some(Eventtype::PlaybackData(playback_data))
+                    }
+                    PlayerControlEvent::Speed(speed) => {
+                        payload.set_name(ServerEventName::Speed);
+                        payload.eventtype = Some(Eventtype::SpeedData(Speed { speed }));
+                    }
+                    PlayerControlEvent::Volume(volume) => {
+                        payload.set_name(ServerEventName::Volume);
+                        payload.eventtype = Some(Eventtype::VolumeData(Volume { volume }))
+                    }
+                }
+                if let Err(what) = tx.send(Ok(payload)) {
+                    println!("Failed {}", what.to_string());
                 }
             }
         });
         let out_stream = Box::pin(UnboundedReceiverStream::new(rx));
 
-        Ok(Response::new(out_stream as Self::GetPositionStreamStream))
+        Ok(Response::new(out_stream as Self::SubscribeEventsStream))
     }
 }

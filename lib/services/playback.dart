@@ -8,14 +8,52 @@ import 'package:rowdy/proto/playback.pbgrpc.dart' as playback;
 
 class PlaybackService {
   late final PlaybackClient channel;
+
+  // Distributed Server Stream Controllers
   final StreamController<Duration> _positionStreamController;
+  final StreamController<Duration> _durationStreamController;
+  final StreamController<Speed> _speedStreamController;
+  final StreamController<ServerPlaybackEvent> _playbackStreamController;
+  final StreamController<Volume> _volumeStreamController;
+
   late Timer _positionPollTimer;
-  PlaybackService() : _positionStreamController = StreamController<Duration>() {
+  late StreamSubscription<ServerEvent> _serverEventSubscription;
+  PlaybackService()
+      : _positionStreamController = StreamController<Duration>(),
+        _durationStreamController = StreamController<Duration>(),
+        _speedStreamController = StreamController<Speed>(),
+        _playbackStreamController = StreamController<ServerPlaybackEvent>(),
+        _volumeStreamController = StreamController<Volume>() {
     channel = PlaybackClient(ClientChannel(
       "localhost",
       port: 50051,
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     ));
+
+    print("Subscribing To Server Stream");
+    final serverEvents = channel.subscribeEvents(Empty());
+    _serverEventSubscription = serverEvents.listen((value) {
+      print(value.name.name);
+      switch (value.name) {
+        case ServerEventName.DURATION:
+          _durationStreamController.sink.add(
+            Duration(
+              milliseconds: value.durationData.milliseconds.toInt(),
+            ),
+          );
+          break;
+        case ServerEventName.PLAYBACK:
+          _playbackStreamController.sink.add(value.playbackData);
+          break;
+        case ServerEventName.SPEED:
+          _speedStreamController.sink.add(value.speedData);
+          break;
+        case ServerEventName.VOLUME:
+          _volumeStreamController.sink.add(value.volumeData);
+          break;
+        default:
+      }
+    });
 
     _positionPollTimer = Timer.periodic(
       const Duration(seconds: 1),
@@ -85,17 +123,16 @@ class PlaybackService {
   }
 
   Stream<Duration> getPositionStream() {
-    return channel.getPositionStream(Empty()).map((duration) {
-      return Duration(milliseconds: duration.milliseconds.toInt());
-    });
-  }
-
-  Stream<Duration> getPolledPositionStream() {
     return _positionStreamController.stream;
   }
 
   void dispose() {
     _positionStreamController.close();
+    _durationStreamController.close();
+    _speedStreamController.close();
+    _playbackStreamController.close();
+    _volumeStreamController.close();
+    _serverEventSubscription.cancel();
     _positionPollTimer.cancel();
   }
 }

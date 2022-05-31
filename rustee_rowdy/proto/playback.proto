@@ -22,7 +22,7 @@ service Playback {
   rpc SetSpeed(Speed) returns (Empty) {}
   rpc Seek(Duration) returns (Empty) {}
   rpc GetPosition(Empty) returns (Duration) {}
-  rpc GetPositionStream(Empty) returns (stream Duration) {}
+  rpc SubscribeEvents(Empty) returns (stream ServerEvent) {}
 }
 
 message Empty {}
@@ -37,3 +37,30 @@ message Path {
   string cwd = 2;
   bool isAbsolute = 3;
 }
+
+enum ServerEventName {
+  DURATION = 0;
+  PLAYBACK = 1;
+  VOLUME = 2;
+  SPEED = 3;
+}
+
+message ServerEvent {
+  ServerEventName name = 1;
+  oneof eventtype {
+    Duration durationData = 2;
+    Speed speedData = 3;
+    ServerPlaybackEvent playbackData = 4;
+    Volume volumeData = 5;
+  }
+}
+
+enum PlaybackEventPlayerState {
+  PAUSED = 0;
+  // change is fired whenever new track is added to the [Sink]
+  CHANGED = 1;
+  RESUMED = 2;
+  STOPPED = 3;
+}
+
+message ServerPlaybackEvent { PlaybackEventPlayerState playbackEventType = 1; }

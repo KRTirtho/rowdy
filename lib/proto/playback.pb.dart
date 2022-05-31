@@ -10,6 +10,10 @@ import 'dart:core' as $core;
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
+import 'playback.pbenum.dart';
+
+export 'playback.pbenum.dart';
+
 class Empty extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Empty', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'playback'), createEmptyInstance: create)
     ..hasRequiredFields = false
@@ -300,5 +304,182 @@ class Path extends $pb.GeneratedMessage {
   $core.bool hasIsAbsolute() => $_has(2);
   @$pb.TagNumber(3)
   void clearIsAbsolute() => clearField(3);
+}
+
+enum ServerEvent_Eventtype {
+  durationData, 
+  speedData, 
+  playbackData, 
+  volumeData, 
+  notSet
+}
+
+class ServerEvent extends $pb.GeneratedMessage {
+  static const $core.Map<$core.int, ServerEvent_Eventtype> _ServerEvent_EventtypeByTag = {
+    2 : ServerEvent_Eventtype.durationData,
+    3 : ServerEvent_Eventtype.speedData,
+    4 : ServerEvent_Eventtype.playbackData,
+    5 : ServerEvent_Eventtype.volumeData,
+    0 : ServerEvent_Eventtype.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ServerEvent', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'playback'), createEmptyInstance: create)
+    ..oo(0, [2, 3, 4, 5])
+    ..e<ServerEventName>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'name', $pb.PbFieldType.OE, defaultOrMaker: ServerEventName.DURATION, valueOf: ServerEventName.valueOf, enumValues: ServerEventName.values)
+    ..aOM<Duration>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'durationData', protoName: 'durationData', subBuilder: Duration.create)
+    ..aOM<Speed>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'speedData', protoName: 'speedData', subBuilder: Speed.create)
+    ..aOM<ServerPlaybackEvent>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'playbackData', protoName: 'playbackData', subBuilder: ServerPlaybackEvent.create)
+    ..aOM<Volume>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'volumeData', protoName: 'volumeData', subBuilder: Volume.create)
+    ..hasRequiredFields = false
+  ;
+
+  ServerEvent._() : super();
+  factory ServerEvent({
+    ServerEventName? name,
+    Duration? durationData,
+    Speed? speedData,
+    ServerPlaybackEvent? playbackData,
+    Volume? volumeData,
+  }) {
+    final _result = create();
+    if (name != null) {
+      _result.name = name;
+    }
+    if (durationData != null) {
+      _result.durationData = durationData;
+    }
+    if (speedData != null) {
+      _result.speedData = speedData;
+    }
+    if (playbackData != null) {
+      _result.playbackData = playbackData;
+    }
+    if (volumeData != null) {
+      _result.volumeData = volumeData;
+    }
+    return _result;
+  }
+  factory ServerEvent.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ServerEvent.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ServerEvent clone() => ServerEvent()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ServerEvent copyWith(void Function(ServerEvent) updates) => super.copyWith((message) => updates(message as ServerEvent)) as ServerEvent; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ServerEvent create() => ServerEvent._();
+  ServerEvent createEmptyInstance() => create();
+  static $pb.PbList<ServerEvent> createRepeated() => $pb.PbList<ServerEvent>();
+  @$core.pragma('dart2js:noInline')
+  static ServerEvent getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ServerEvent>(create);
+  static ServerEvent? _defaultInstance;
+
+  ServerEvent_Eventtype whichEventtype() => _ServerEvent_EventtypeByTag[$_whichOneof(0)]!;
+  void clearEventtype() => clearField($_whichOneof(0));
+
+  @$pb.TagNumber(1)
+  ServerEventName get name => $_getN(0);
+  @$pb.TagNumber(1)
+  set name(ServerEventName v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasName() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearName() => clearField(1);
+
+  @$pb.TagNumber(2)
+  Duration get durationData => $_getN(1);
+  @$pb.TagNumber(2)
+  set durationData(Duration v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasDurationData() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearDurationData() => clearField(2);
+  @$pb.TagNumber(2)
+  Duration ensureDurationData() => $_ensure(1);
+
+  @$pb.TagNumber(3)
+  Speed get speedData => $_getN(2);
+  @$pb.TagNumber(3)
+  set speedData(Speed v) { setField(3, v); }
+  @$pb.TagNumber(3)
+  $core.bool hasSpeedData() => $_has(2);
+  @$pb.TagNumber(3)
+  void clearSpeedData() => clearField(3);
+  @$pb.TagNumber(3)
+  Speed ensureSpeedData() => $_ensure(2);
+
+  @$pb.TagNumber(4)
+  ServerPlaybackEvent get playbackData => $_getN(3);
+  @$pb.TagNumber(4)
+  set playbackData(ServerPlaybackEvent v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasPlaybackData() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearPlaybackData() => clearField(4);
+  @$pb.TagNumber(4)
+  ServerPlaybackEvent ensurePlaybackData() => $_ensure(3);
+
+  @$pb.TagNumber(5)
+  Volume get volumeData => $_getN(4);
+  @$pb.TagNumber(5)
+  set volumeData(Volume v) { setField(5, v); }
+  @$pb.TagNumber(5)
+  $core.bool hasVolumeData() => $_has(4);
+  @$pb.TagNumber(5)
+  void clearVolumeData() => clearField(5);
+  @$pb.TagNumber(5)
+  Volume ensureVolumeData() => $_ensure(4);
+}
+
+class ServerPlaybackEvent extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ServerPlaybackEvent', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'playback'), createEmptyInstance: create)
+    ..e<PlaybackEventPlayerState>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'playbackEventType', $pb.PbFieldType.OE, protoName: 'playbackEventType', defaultOrMaker: PlaybackEventPlayerState.PAUSED, valueOf: PlaybackEventPlayerState.valueOf, enumValues: PlaybackEventPlayerState.values)
+    ..hasRequiredFields = false
+  ;
+
+  ServerPlaybackEvent._() : super();
+  factory ServerPlaybackEvent({
+    PlaybackEventPlayerState? playbackEventType,
+  }) {
+    final _result = create();
+    if (playbackEventType != null) {
+      _result.playbackEventType = playbackEventType;
+    }
+    return _result;
+  }
+  factory ServerPlaybackEvent.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ServerPlaybackEvent.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ServerPlaybackEvent clone() => ServerPlaybackEvent()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ServerPlaybackEvent copyWith(void Function(ServerPlaybackEvent) updates) => super.copyWith((message) => updates(message as ServerPlaybackEvent)) as ServerPlaybackEvent; // ignore: deprecated_member_use
+  $pb.BuilderInfo get info_ => _i;
+  @$core.pragma('dart2js:noInline')
+  static ServerPlaybackEvent create() => ServerPlaybackEvent._();
+  ServerPlaybackEvent createEmptyInstance() => create();
+  static $pb.PbList<ServerPlaybackEvent> createRepeated() => $pb.PbList<ServerPlaybackEvent>();
+  @$core.pragma('dart2js:noInline')
+  static ServerPlaybackEvent getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ServerPlaybackEvent>(create);
+  static ServerPlaybackEvent? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  PlaybackEventPlayerState get playbackEventType => $_getN(0);
+  @$pb.TagNumber(1)
+  set playbackEventType(PlaybackEventPlayerState v) { setField(1, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasPlaybackEventType() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearPlaybackEventType() => clearField(1);
 }
 

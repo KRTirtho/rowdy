@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     playback.getVolume().then((value) {
       volume = value;
     });
-    playback.getPolledPositionStream().listen(
+    playback.getPositionStream().listen(
       (value) {
         if (value != Duration.zero && !changing) {
           setState(() {

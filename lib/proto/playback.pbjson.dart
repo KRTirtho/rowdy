@@ -8,6 +8,32 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+@$core.Deprecated('Use serverEventNameDescriptor instead')
+const ServerEventName$json = const {
+  '1': 'ServerEventName',
+  '2': const [
+    const {'1': 'DURATION', '2': 0},
+    const {'1': 'PLAYBACK', '2': 1},
+    const {'1': 'VOLUME', '2': 2},
+    const {'1': 'SPEED', '2': 3},
+  ],
+};
+
+/// Descriptor for `ServerEventName`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List serverEventNameDescriptor = $convert.base64Decode('Cg9TZXJ2ZXJFdmVudE5hbWUSDAoIRFVSQVRJT04QABIMCghQTEFZQkFDSxABEgoKBlZPTFVNRRACEgkKBVNQRUVEEAM=');
+@$core.Deprecated('Use playbackEventPlayerStateDescriptor instead')
+const PlaybackEventPlayerState$json = const {
+  '1': 'PlaybackEventPlayerState',
+  '2': const [
+    const {'1': 'PAUSED', '2': 0},
+    const {'1': 'CHANGED', '2': 1},
+    const {'1': 'RESUMED', '2': 2},
+    const {'1': 'STOPPED', '2': 3},
+  ],
+};
+
+/// Descriptor for `PlaybackEventPlayerState`. Decode as a `google.protobuf.EnumDescriptorProto`.
+final $typed_data.Uint8List playbackEventPlayerStateDescriptor = $convert.base64Decode('ChhQbGF5YmFja0V2ZW50UGxheWVyU3RhdGUSCgoGUEFVU0VEEAASCwoHQ0hBTkdFRBABEgsKB1JFU1VNRUQQAhILCgdTVE9QUEVEEAM=');
 @$core.Deprecated('Use emptyDescriptor instead')
 const Empty$json = const {
   '1': 'Empty',
@@ -67,3 +93,30 @@ const Path$json = const {
 
 /// Descriptor for `Path`. Decode as a `google.protobuf.DescriptorProto`.
 final $typed_data.Uint8List pathDescriptor = $convert.base64Decode('CgRQYXRoEhIKBHBhdGgYASABKAlSBHBhdGgSEAoDY3dkGAIgASgJUgNjd2QSHgoKaXNBYnNvbHV0ZRgDIAEoCFIKaXNBYnNvbHV0ZQ==');
+@$core.Deprecated('Use serverEventDescriptor instead')
+const ServerEvent$json = const {
+  '1': 'ServerEvent',
+  '2': const [
+    const {'1': 'name', '3': 1, '4': 1, '5': 14, '6': '.playback.ServerEventName', '10': 'name'},
+    const {'1': 'durationData', '3': 2, '4': 1, '5': 11, '6': '.playback.Duration', '9': 0, '10': 'durationData'},
+    const {'1': 'speedData', '3': 3, '4': 1, '5': 11, '6': '.playback.Speed', '9': 0, '10': 'speedData'},
+    const {'1': 'playbackData', '3': 4, '4': 1, '5': 11, '6': '.playback.ServerPlaybackEvent', '9': 0, '10': 'playbackData'},
+    const {'1': 'volumeData', '3': 5, '4': 1, '5': 11, '6': '.playback.Volume', '9': 0, '10': 'volumeData'},
+  ],
+  '8': const [
+    const {'1': 'eventtype'},
+  ],
+};
+
+/// Descriptor for `ServerEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List serverEventDescriptor = $convert.base64Decode('CgtTZXJ2ZXJFdmVudBItCgRuYW1lGAEgASgOMhkucGxheWJhY2suU2VydmVyRXZlbnROYW1lUgRuYW1lEjgKDGR1cmF0aW9uRGF0YRgCIAEoCzISLnBsYXliYWNrLkR1cmF0aW9uSABSDGR1cmF0aW9uRGF0YRIvCglzcGVlZERhdGEYAyABKAsyDy5wbGF5YmFjay5TcGVlZEgAUglzcGVlZERhdGESQwoMcGxheWJhY2tEYXRhGAQgASgLMh0ucGxheWJhY2suU2VydmVyUGxheWJhY2tFdmVudEgAUgxwbGF5YmFja0RhdGESMgoKdm9sdW1lRGF0YRgFIAEoCzIQLnBsYXliYWNrLlZvbHVtZUgAUgp2b2x1bWVEYXRhQgsKCWV2ZW50dHlwZQ==');
+@$core.Deprecated('Use serverPlaybackEventDescriptor instead')
+const ServerPlaybackEvent$json = const {
+  '1': 'ServerPlaybackEvent',
+  '2': const [
+    const {'1': 'playbackEventType', '3': 1, '4': 1, '5': 14, '6': '.playback.PlaybackEventPlayerState', '10': 'playbackEventType'},
+  ],
+};
+
+/// Descriptor for `ServerPlaybackEvent`. Decode as a `google.protobuf.DescriptorProto`.
+final $typed_data.Uint8List serverPlaybackEventDescriptor = $convert.base64Decode('ChNTZXJ2ZXJQbGF5YmFja0V2ZW50ElAKEXBsYXliYWNrRXZlbnRUeXBlGAEgASgOMiIucGxheWJhY2suUGxheWJhY2tFdmVudFBsYXllclN0YXRlUhFwbGF5YmFja0V2ZW50VHlwZQ==');
