@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:rowdy/rowdy.dart';
 
 void main() {
-  // Rowdy.initialize();
+  Rowdy.initialize();
   runApp(const MyApp());
 }
 
@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     playback.getVolume().then((value) {
       volume = value;
     });
-    playback.getPositionStream().listen(
+    playback.positionStream.listen(
       (value) {
         if (value != Duration.zero && !changing) {
           setState(() {
@@ -142,7 +142,6 @@ class _MyAppState extends State<MyApp> {
                 });
               },
               onChangeEnd: (value) {
-                print("OnChange End");
                 // setting volume in percentage
                 setState(() {
                   playback.setVolume(value).then((_) {

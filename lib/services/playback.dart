@@ -16,6 +16,13 @@ class PlaybackService {
   final StreamController<ServerPlaybackEvent> _playbackStreamController;
   final StreamController<Volume> _volumeStreamController;
 
+  Duration position = Duration.zero;
+  Duration duration = Duration.zero;
+  Volume volume = Volume(volume: 100);
+  ServerPlaybackEvent playbackState =
+      ServerPlaybackEvent(playbackEventType: PlaybackEventPlayerState.STOPPED);
+  Speed speed = Speed(speed: 1);
+
   late Timer _positionPollTimer;
   late StreamSubscription<ServerEvent> _serverEventSubscription;
 
@@ -31,39 +38,39 @@ class PlaybackService {
       options: const ChannelOptions(credentials: ChannelCredentials.insecure()),
     ));
 
-    print("Subscribing To Server Stream");
     final serverEvents = channel.subscribeEvents(Empty());
     _serverEventSubscription = serverEvents.listen(
       (value) {
-        print(value.name.name);
         switch (value.name) {
           case ServerEventName.DURATION:
-            _durationStreamController.sink.add(
-              Duration(
-                milliseconds: value.durationData.milliseconds.toInt(),
-              ),
+            final data = Duration(
+              milliseconds: value.durationData.milliseconds.toInt(),
             );
+            duration = data;
+            _durationStreamController.sink.add(data);
             break;
           case ServerEventName.PLAYBACK:
+            playbackState = value.playbackData;
             _playbackStreamController.sink.add(value.playbackData);
             break;
           case ServerEventName.SPEED:
+            speed = value.speedData;
             _speedStreamController.sink.add(value.speedData);
             break;
           case ServerEventName.VOLUME:
+            volume = value.volumeData;
             _volumeStreamController.sink.add(value.volumeData);
             break;
           default:
         }
       },
-      onDone: () => print("Done Listening to Stream"),
-      onError: (error) => print("There's an error $error"),
     );
 
     _positionPollTimer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) async {
         if (_positionStreamController.isClosed) return timer.cancel();
+        if (!playing) return;
         final fetchedDuration = await channel.getPosition(Empty());
         _positionStreamController.sink.add(
           Duration(milliseconds: fetchedDuration.milliseconds.toInt()),
@@ -71,6 +78,28 @@ class PlaybackService {
       },
     );
   }
+
+  bool get playing => [
+        PlaybackEventPlayerState.CHANGED,
+        PlaybackEventPlayerState.RESUMED,
+      ].contains(playbackState.playbackEventType);
+
+  Stream<Duration> get positionStream => _positionStreamController.stream;
+
+  Stream<Duration> get durationStream => _durationStreamController.stream;
+
+  Stream<playback.Volume> get volumeStream => _volumeStreamController.stream;
+
+  Stream<playback.ServerPlaybackEvent> get playbackStateStream =>
+      _playbackStreamController.stream;
+
+  Stream<playback.Speed> get speedStream => _speedStreamController.stream;
+
+  Stream<bool> get playingStream =>
+      _playbackStreamController.stream.map((event) => [
+            PlaybackEventPlayerState.CHANGED,
+            PlaybackEventPlayerState.RESUMED,
+          ].contains(event.playbackEventType));
 
   Future<String> getHello() async {
     try {
@@ -125,10 +154,6 @@ class PlaybackService {
   Future<void> seek(Duration position) async {
     await channel
         .seek(playback.Duration(milliseconds: Int64(position.inMilliseconds)));
-  }
-
-  Stream<Duration> getPositionStream() {
-    return _positionStreamController.stream;
   }
 
   void dispose() {

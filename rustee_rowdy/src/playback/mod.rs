@@ -106,7 +106,7 @@ impl Playback for PlaybackService {
         let position = incoming.get_ref().milliseconds;
         let mut player = self.player.write().await;
 
-        player.seek(position / 1000);
+        player.seek_to(std::time::Duration::from_millis(position as u64));
 
         Ok(Response::new(Empty {}))
     }
