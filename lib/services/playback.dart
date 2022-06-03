@@ -18,6 +18,7 @@ class PlaybackService {
 
   late Timer _positionPollTimer;
   late StreamSubscription<ServerEvent> _serverEventSubscription;
+
   PlaybackService()
       : _positionStreamController = StreamController<Duration>(),
         _durationStreamController = StreamController<Duration>(),
@@ -32,28 +33,32 @@ class PlaybackService {
 
     print("Subscribing To Server Stream");
     final serverEvents = channel.subscribeEvents(Empty());
-    _serverEventSubscription = serverEvents.listen((value) {
-      print(value.name.name);
-      switch (value.name) {
-        case ServerEventName.DURATION:
-          _durationStreamController.sink.add(
-            Duration(
-              milliseconds: value.durationData.milliseconds.toInt(),
-            ),
-          );
-          break;
-        case ServerEventName.PLAYBACK:
-          _playbackStreamController.sink.add(value.playbackData);
-          break;
-        case ServerEventName.SPEED:
-          _speedStreamController.sink.add(value.speedData);
-          break;
-        case ServerEventName.VOLUME:
-          _volumeStreamController.sink.add(value.volumeData);
-          break;
-        default:
-      }
-    });
+    _serverEventSubscription = serverEvents.listen(
+      (value) {
+        print(value.name.name);
+        switch (value.name) {
+          case ServerEventName.DURATION:
+            _durationStreamController.sink.add(
+              Duration(
+                milliseconds: value.durationData.milliseconds.toInt(),
+              ),
+            );
+            break;
+          case ServerEventName.PLAYBACK:
+            _playbackStreamController.sink.add(value.playbackData);
+            break;
+          case ServerEventName.SPEED:
+            _speedStreamController.sink.add(value.speedData);
+            break;
+          case ServerEventName.VOLUME:
+            _volumeStreamController.sink.add(value.volumeData);
+            break;
+          default:
+        }
+      },
+      onDone: () => print("Done Listening to Stream"),
+      onError: (error) => print("There's an error $error"),
+    );
 
     _positionPollTimer = Timer.periodic(
       const Duration(seconds: 1),

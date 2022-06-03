@@ -5,7 +5,7 @@ use std::time::Duration;
 //     collections::VecDeque,
 //     sync::atomic::{AtomicBool, AtomicUsize, Ordering},
 // };
-use flume::{self};
+use flume;
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 
 use crate::{PlaybackStatusType, PlayerControlEvent};
@@ -45,8 +45,8 @@ struct Controls {
 impl Sink {
     /// Builds a new `Sink`, beginning playback on a stream.
     #[inline]
-    pub fn try_new(stream: &OutputStreamHandle) -> Result<Self, PlayError> {
-        let (sink, queue_rx) = Self::new_idle();
+    pub fn try_new(stream: &OutputStreamHandle, chan: (Arc<flume::Sender<PlayerControlEvent>>, Arc<flume::Receiver<PlayerControlEvent>>)) -> Result<Self, PlayError> {
+        let (sink, queue_rx) = Self::new_idle(chan);
         stream.play_raw(queue_rx)?;
         // stream.play_raw(queue_rx).ok();
         Ok(sink)
@@ -54,9 +54,8 @@ impl Sink {
 
     /// Builds a new `Sink`.
     #[inline]
-    pub fn new_idle() -> (Self, queue::SourcesQueueOutput<f32>) {
+    pub fn new_idle((control_event_tx, control_event_rx): (Arc<flume::Sender<PlayerControlEvent>>, Arc<flume::Receiver<PlayerControlEvent>>)) -> (Self, queue::SourcesQueueOutput<f32>) {
         let (queue_tx, queue_rx) = queue::queue(true);
-        let (control_event_tx, control_event_rx) = flume::unbounded::<PlayerControlEvent>();
 
         let sink = Self {
             queue_tx,
@@ -72,8 +71,8 @@ impl Sink {
             sound_count: Arc::new(AtomicUsize::new(0)),
             detached: false,
             elapsed: Arc::new(RwLock::new(Duration::from_secs(0))),
-            control_event_rx: Arc::new(control_event_rx),
-            control_event_tx: Arc::new(control_event_tx),
+            control_event_rx,
+            control_event_tx,
         };
 
         let post_ctrl_event_tx = sink.control_event_tx.clone();
@@ -90,10 +89,10 @@ impl Sink {
     /// Appends a sound to the queue of sounds to play.
     #[inline]
     pub fn append<S>(&self, source: S)
-    where
-        S: Source + Send + 'static,
-        S::Item: Sample + Send,
-        // S::Item: Send,
+        where
+            S: Source + Send + 'static,
+            S::Item: Sample + Send,
+    // S::Item: Send,
     {
         let controls = self.controls.clone();
 

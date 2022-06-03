@@ -42,6 +42,8 @@ mod sink;
 pub mod source;
 mod stream;
 
+use flume;
+
 pub use conversions::Sample;
 pub use cpal::{
     self, traits::DeviceTrait, Device, Devices, DevicesError, InputDevices, OutputDevices,
@@ -84,11 +86,17 @@ pub struct Player {
     volume: u16,
     safe_guard: bool,
     speed: f32,
+    pub control_event_tx: Arc<flume::Sender<PlayerControlEvent>>,
+    pub control_event_rx: Arc<flume::Receiver<PlayerControlEvent>>,
 }
+
 impl Default for Player {
     fn default() -> Self {
         let (stream, handle) = OutputStream::try_default().unwrap();
-        let sink = Sink::try_new(&handle).unwrap();
+        let chan = flume::unbounded::<PlayerControlEvent>();
+        let control_event_tx = Arc::new(chan.0);
+        let control_event_rx = Arc::new(chan.1);
+        let sink = Sink::try_new(&handle, (control_event_tx.clone(), control_event_rx.clone())).unwrap();
         let volume = 50;
         sink.set_volume(f32::from(volume) / 100.0);
         let speed = 1.0;
@@ -102,6 +110,8 @@ impl Default for Player {
             volume,
             safe_guard: true,
             speed,
+            control_event_rx,
+            control_event_tx,
         }
     }
 }
@@ -140,7 +150,7 @@ impl Player {
     }
     pub fn stop(&mut self) {
         // self.sink.destroy();
-        self.sink = Sink::try_new(&self.handle).unwrap();
+        self.sink = Sink::try_new(&self.handle, (self.control_event_tx.clone(), self.control_event_rx.clone())).unwrap();
         self.sink.set_volume(f32::from(self.volume) / 100.0);
     }
     pub fn elapsed(&self) -> Duration {
@@ -214,7 +224,7 @@ impl Player {
     }
 
     pub fn get_control_event_receiver(&self) -> Arc<Receiver<PlayerControlEvent>> {
-        self.sink.control_event_rx.clone()
+        self.control_event_rx.clone()
     }
 }
 
@@ -272,9 +282,9 @@ impl GeneralP for Player {
     }
 
     #[allow(
-        clippy::cast_possible_wrap,
-        clippy::cast_precision_loss,
-        clippy::cast_possible_truncation
+    clippy::cast_possible_wrap,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_truncation
     )]
     fn get_progress(&mut self) -> Result<(f64, i64, i64)> {
         let position = self.elapsed().as_secs() as i64;
@@ -284,6 +294,11 @@ impl GeneralP for Player {
             percent = 100.0;
         }
         Ok((percent, position, duration))
+    }
+
+    fn set_speed(&mut self, speed: f32) {
+        self.speed = speed;
+        self.set_speed(speed);
     }
 
     fn speed_up(&mut self) {
@@ -302,17 +317,13 @@ impl GeneralP for Player {
         self.set_speed(speed);
     }
 
-    fn set_speed(&mut self, speed: f32) {
-        self.speed = speed;
-        self.set_speed(speed);
-    }
-
     fn speed(&self) -> f32 {
         self.speed
     }
 }
 
 unsafe impl Send for Player {}
+
 unsafe impl Sync for Player {}
 
 pub trait GeneralP {
