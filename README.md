@@ -1,4 +1,4 @@
-************# Rowdy
+# Rowdy
 
 Pure Rust based Dart/Flutter audio playback library
 
@@ -68,5 +68,5 @@ set(BUILD_BUNDLE_DIR "$<TARGET_FILE_DIR:${BINARY_NAME}>")
   - [x] Speed
   - [x] Volume
   - [x] Playing
-- [] Network Audio File
-- [] Audio File Stream
+- [ ] Network Audio File
+- [ ] Audio File Stream
